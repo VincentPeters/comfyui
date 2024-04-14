@@ -18,8 +18,8 @@ CHECKPOINT_MODELS=(
     "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt"
     "https://civitai.com/api/download/models/357609" # juggernaut XL
     #"https://huggingface.co/stabilityai/stable-diffusion-2-1/resolve/main/v2-1_768-ema-pruned.ckpt"
-    #"https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors"
-    #"https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors"
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors"
+    "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors"
 )
 
 LORA_MODELS=(
@@ -151,3 +151,27 @@ function provisioning_download() {
 }
 
 provisioning_start
+
+printf "\n##############################################\n#                                            #\n#          Provisioning container            #\n#                                            #\n#         This will take some time           #\n#                                            #\n# Your container will be ready on completion #\n#                                            #\n##############################################\n\n"
+function download() {
+    wget -q --show-progress -e dotbytes="${3:-4M}" -O "$2" "$1"
+}
+
+## Set paths
+nodes_dir=/opt/ComfyUI/custom_nodes
+models_dir=/opt/ComfyUI/models
+checkpoints_dir=${models_dir}/checkpoints
+vae_dir=${models_dir}/vae
+controlnet_dir=${models_dir}/controlnet
+loras_dir=${models_dir}/loras
+upscale_dir=${models_dir}/upscale_models
+
+### Install custom nodes
+
+# ComfyUI-Manager
+this_node_dir=${nodes_dir}/ComfyUI-Manager
+if [[ ! -d $this_node_dir ]]; then
+    git clone https://github.com/ltdrdata/ComfyUI-Manager $this_node_dir
+else
+    (cd $this_node_dir && git pull)
+fi
